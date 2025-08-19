@@ -31,10 +31,36 @@ Using the query object, I then used the following in a terminal to download the 
 `"C:/Users/colin/Downloads/gdc-client_2.3_Windows_x64-py3.8-windows-2019/gdc-client_2.3_Windows_x64/gdc-client.exe" download -m "C:/path/to/your/gdc_manifest.txt"`
 
 It was necessary to download the data in this way rather than using `GDCdownload()` as there was a mismatch between
-the files included in my manifest and those expected by `GDCdownload()`. I then prepared the data in R using:
+the files included in my manifest and those expected by `GDCdownload()`. I then prepared the data in R using
+GDCprepare, however in order to do this I had to first specify where the data were saved and what the
+output file would be named:
+
+`output_filename <- "TCGA-BRCA-RNASeq-SummarizedExperiment.RData"
+data_dir <- "C:/Users/colin/Documents/R projects/RNA-seq-clustering/GDCdata/"`
+
+I then created the `se_object` with:
 
 `se_object <- GDCprepare(
-        query = query,
-        save = TRUE,
-        )`
+    query = query,
+    save = TRUE,
+    save.filename = file.path(data_dir, output_filename),
+    directory = data_dir
+)`
 
+
+## Exploratory data analysis
+
+
+
+
+
+## Clustering of samples
+
+
+
+
+## Machine learning applications with pytorch and sklearn
+
+
+
+## Deep learning
