@@ -25,6 +25,21 @@ print(paste("Original number of genes:", nrow(dds)))
 print(paste("Number of genes after filtering:", nrow(dds_filtered)))
 vst_data_filtered <- vst(dds_filtered, blind = TRUE)
 plotPCA(vst_data, intgroup = "sample_type")
+plotPCA(vst_data, intgroup = "paper_BRCA_Subtype_PAM50")
+
+pcaData <- plotPCA(vst_data_filtered, intgroup = "sample_type", returnData = TRUE)
+
+
+ggplot(pcaData, aes(x = sample_type, y = PC1, fill = sample_type)) +
+geom_boxplot() +
+labs(title = "PC1 Scores by Sample Type", x = "Sample Type", y = "PC1 Score") +
+theme_minimal()
+
+ggplot(pcaData, aes(x = paper_BRCA_Subtype_PAM50, y = PC1, fill = paper_BRCA_Subtype_PAM50)) +
+  geom_boxplot() +
+  labs(title = "PC1 Scores by PAM50", x = "PAM50", y = "PC1 Score") +
+  theme_minimal()
+
 
 sampleDists <- dist(t(assay(vst_data_filtered)))
 sampleDistMatrix <- as.matrix(sampleDists)
@@ -37,3 +52,4 @@ pheatmap(sampleDistMatrix,
   show_rownames = FALSE,
   show_colnames = FALSE
 )
+

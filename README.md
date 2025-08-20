@@ -119,6 +119,23 @@ plot there were no major outliers in the data set.
 
 ![PCA Plot of TCGA-BRCA RNA-Seq Data](figures/pca_plot_tcga_brca.png)
 
+Next I investigated whether the type of cancer was associated with variation in the data
+by plotting the PCA plot again, but this time grouped by "paper_BRCA_Subtype_PAM50":
+
+`plotPCA(vst_data, intgroup = "paper_BRCA_Subtype_PAM50")`
+
+![PCA plot grouped by PAM50](figures/pca-pam50.png)
+
+This plot clearly showed that the subtype of cancer was a major source of variation in
+the data. Another plot of PC1 score vs subtype confirmed this observation:
+
+`ggplot(pcaData, aes(x = paper_BRCA_Subtype_PAM50, y = PC1, fill = paper_BRCA_Subtype_PAM50)) +`
+`  geom_boxplot() +`
+`  labs(title = "PC1 Scores by PAM50", x = "PAM50", y = "PC1 Score") +`
+`  theme_minimal()`
+
+![PC1 and PAM50](figures/pc1-pam50.png)
+
 ## Clustering of samples
 
 Next I evaluated the relationships between the samples using a heatmap. To do this I used the
