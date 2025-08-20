@@ -121,6 +121,7 @@ Before plotting the PCA plot: `plotPCA(vst_data, intgroup = "sample_type")`.
 This plotted the samples on PC1 and PC2 and coloured the data points by sample type
 i.e. whether the sample was metastatic, primary tumour or normal tissue.
 
+![PCA Plot of TCGA-BRCA RNA-Seq Data](figures/pca_plot_tcga_brca.png)
 
 ## Clustering of samples
 
