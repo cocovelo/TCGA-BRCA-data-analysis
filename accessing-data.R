@@ -1,3 +1,8 @@
+library(tidyverse)
+library(GEOquery)
+library(TCGAbiolinks)
+library(SummarizedExperiment)
+
 manifest <- read.delim("C:/Users/colin/Downloads/gdc_manifest.2025-08-18.140242.txt")
 
 query <- GDCquery(
@@ -22,3 +27,5 @@ se_object <- GDCprepare(
   save.filename = file.path(data_dir, output_filename),
   directory = data_dir
 )
+
+ge_data <- assay(se_object)
