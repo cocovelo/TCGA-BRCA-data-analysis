@@ -128,7 +128,17 @@ pheatmap package. I calculated the distances between the samples first using:
 Then collected the metadata for annotation:
 `annotation_col <- as.data.frame(colData(vst_data_filtered)[, c("sample_type", "gender")])`
 
+I used the following to create the heatmap plot:
+`pheatmap(sampleDistMatrix,`
+`  clustering_distance_rows=sampleDists,`
+`  clustering_distance_cols=sampleDists,`
+`  annotation_col=annotation_col,`
+`  main="Sample-to-Sample Distance Heatmap",`
+`  show_rownames = FALSE,`
+`  show_colnames = FALSE`
+`)`
 
+![Sample-to-sample distance heatmap](figures/sampletosampledistanceheatmap.png)
 
 ## Machine learning applications with pytorch and sklearn
 
