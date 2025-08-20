@@ -91,40 +91,42 @@ using
 
 Then confirmed the class was a "SummarizedExperiment" object using `class(data)`.
 Then saved only the gene expression data as a new object:
-`ge_data <- assay(data)`
+`raw_counts_matrix <- assays(data)$unstranded`and the metadata/additional variables
+`sample_data_df <- as.data.frame(colData(data))`.
 
-This gene expression data matrix was then fed into the edgeR pipeline for RNA-sequencing
-analysis. To do this, the matrix was converted to an edgeR object with `my_dgelist <- DGEList(ge_data)`.
-Then `norm_dgelist <- normLibSizes(my_dgelist)` was carried out which estimates the
-normalisation needed across the samples. Next, I used `filterByExpr` to identify genes
-which were not expressed across the majority of samples `filtered_ge <- filterByExpr(norm_dgelist)`.
-Using `table(filtered_ge)` it was possible to see that 42,329 genes were filtered at this
-stage, leaving 18,331 for analysis. 
+The raw_counts_matrix was then converted to a DESeqDataSet object for processing of the
+data:
+`dds <- DESeqDataSetFromMatrix(countData = raw_counts_matrix,`
+                              `colData = sample_data_df,`
+                              `design = ~1)`
 
-To remove the genes recommended for exclusion due to low expression:
-`retained_ge <- norm_dgelist[filtered_ge, , keep.lib.size = FALSE]`
-`nrow(retained_ge)` confirmed that the retained_ge data matrix has 18,331 rows
-representing the 18,331 genes with expression data.
+Next, I used `filterByExpr` to identify genes which were not expressed across the majority
+of samples:
+`keep <- filterByExpr(dds)` and `dds_filtered <- dds[keep,]`.
+`print(paste("Original number of genes:", nrow(dds)))` and
+`print(paste("Number of genes after filtering:", nrow(dds_filtered)))` confirmed that
+there were 60,660 genes initially in the matrix but after filtering that number was
+reduced to 18,303.
 
-To carry out the next steps in the exploratory analysis of the data, I used the
-DESeq2 package. First, I saved the unstranded count data from my data set:
-`raw_counts <- assays(data)$unstranded`
-Then I converted the data object from a SummarizedExperiment object to a DESeqDataSet
-object:
-`dds <- DESeqDataSetFromMatrix(countData = raw_counts,`
-`colData = colData(data),`
-`design = ~1)`
 Next I performed a variance stabilising transformation to the data which is a normalisation
-process:
+technique suitable for machine learning processes:
 `vst_data <- vst(dds, blind = TRUE)`
-Before plotting the PCA plot: `plotPCA(vst_data, intgroup = "sample_type")`.
+Before plotting a PCA plot to visualise the samples and their relationships to one another:
+`plotPCA(vst_data, intgroup = "sample_type")`.
 This plotted the samples on PC1 and PC2 and coloured the data points by sample type
-i.e. whether the sample was metastatic, primary tumour or normal tissue.
+i.e. whether the sample was metastatic, primary tumour or normal tissue. Based on this PCA
+plot there were no major outliers in the data set.
 
 ![PCA Plot of TCGA-BRCA RNA-Seq Data](figures/pca_plot_tcga_brca.png)
 
 ## Clustering of samples
 
+Next I evaluated the relationships between the samples using a heatmap. To do this I used the
+pheatmap package. I calculated the distances between the samples first using:
+`sampleDists <- dist(t(assay(vst_data_filtered)))`
+`sampleDistMatrix <- as.matrix(sampleDists)`
+Then collected the metadata for annotation:
+`annotation_col <- as.data.frame(colData(vst_data_filtered)[, c("sample_type", "gender")])`
 
 
 
