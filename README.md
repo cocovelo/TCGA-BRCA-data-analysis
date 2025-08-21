@@ -110,9 +110,9 @@ reduced to 18,303.
 
 Next I performed a variance stabilising transformation to the data which is a normalisation
 technique suitable for machine learning processes:
-`vst_data <- vst(dds, blind = TRUE)`
+`vst_data_filtered <- vst(dds_filtered, blind = TRUE)`
 Before plotting a PCA plot to visualise the samples and their relationships to one another:
-`plotPCA(vst_data, intgroup = "sample_type")`.
+`plotPCA(vst_data_filtered, intgroup = "sample_type")`.
 This plotted the samples on PC1 and PC2 and coloured the data points by sample type
 i.e. whether the sample was metastatic, primary tumour or normal tissue. Based on this PCA
 plot there were no major outliers in the data set.
@@ -135,6 +135,46 @@ the data. Another plot of PC1 score vs subtype confirmed this observation:
 `  theme_minimal()`
 
 ![PC1 and PAM50](figures/pc1-pam50.png)
+
+As an additional check, I wanted to ensure that the principal components were normally
+distributed so that I could discern whether to use ANOVA or Kruskal-Wallis statistical
+tests when investigating relationships between the PCs and other metadata variables.
+
+`hist(pcaData$PC1)` and `hist(pcaData$PC2)` confirmed a normal distribution of both PC1 and PC2.
+
+I then performed an ANOVA test between "sample-type" and PC1, and "sample-type" and PC2:
+`aov_result_pc1 <- aov(PC1 ~ sample_type, data = pcaData)`
+`summary(aov_result_pc1)`
+`aov_result_pc2 <- aov(PC2 ~ sample_type, data = pcaData)`
+`summary(aov_result_pc2)`
+This confirmed that sample-type was statistically significantly associated with PC1 and PC2.
+
+I performed the same tests for the "paper_BRCA_Subtype_PAM50" variable:
+`aov_result_pc1 <- aov(PC1 ~ paper_BRCA_Subtype_PAM50, data = pcaData)`
+`summary(aov_result_pc1)`
+`aov_result_pc2 <- aov(PC2 ~ paper_BRCA_Subtype_PAM50, data = pcaData)`
+`summary(aov_result_pc2)`
+These tests confirmed that paper_BRCA_Subtype_PAM50  was also significantly associated with
+PC1 and PC2. Testing of race confirmed that race was significantly associated with the PCs
+which means that race should be considered in any future statistical modelling.
+
+For continuous variables, I used linear regression to determine whether or not age at diagnosis
+was significantly associated with PC1. Plotting the results of this suggested a positive
+correlation between PC1 score and age at diagnosis, though the correlation was weak
+(Pearson correlation = 0.177):
+
+`ggplot(pcaData, aes(x = age_at_diagnosis, y = PC1)) +`
+`    geom_point(alpha = 0.6) +`
+`    geom_smooth(method = "lm", se = FALSE, color = "blue") + # Add a linear regression line`
+`    labs(title = "PC1 Scores vs. Age at Diagnosis", x = "Age at Diagnosis", y = "PC1 Score") +`
+`    theme_minimal()`
+
+`if ("age_at_diagnosis" %in% colnames(pcaData)) {`
+`  cor_pc1_age <- cor(pcaData$PC1, pcaData$age_at_diagnosis, use = "pairwise.complete.obs")`
+`  print(paste("Pearson correlation (PC1 vs Age):", round(cor_pc1_age, 3)))`
+`}`
+
+![PC1 vs age at diagnosis scatter plot](figures/age-pc1-scatter-plot.png)
 
 ## Clustering of samples
 
