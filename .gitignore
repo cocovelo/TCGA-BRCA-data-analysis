@@ -3,3 +3,13 @@
 .RData
 .Ruserdata
 /GDCdata
+df.rds
+gdc-client_2.3_Windows_x64-py3.8-windows-2019.zip
+gdc-client_2.3_Windows_x64.zip
+gdc_client_configuration.dtt
+gdc_manifest.txt
+results.rds
+PCAplotofTCGABRCAgeneexpressiondata
+.RDataTmp
+.RDataTmp1
+.RDataTmp2
