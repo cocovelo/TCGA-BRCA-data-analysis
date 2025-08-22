@@ -13,3 +13,6 @@ PCAplotofTCGABRCAgeneexpressiondata
 .RDataTmp
 .RDataTmp1
 .RDataTmp2
+tcga-brca-vst-normalized-counts.csv
+tcga-brca-raw-counts-matrix.csv
+tcga_brca_sample_metadata.csv
