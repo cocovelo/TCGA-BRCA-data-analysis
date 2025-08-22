@@ -197,11 +197,13 @@ I used the following to create the heatmap plot:
 
 ![Sample-to-sample distance heatmap](figures/sampletosampledistanceheatmap.png)
 
-## Machine learning applications with pytorch and sklearn
+## Machine learning applications
 
+### K-nearest neighbours classification
 
+![Comparison of values of k](figures/values-of-k-knn.png)
 
-## Deep learning
+## Deep Learning
 
 
 
