@@ -7,11 +7,10 @@ library(pheatmap)
 
 saved_file_path <- "C:/Users/colin/Documents/R projects/RNA-seq-clustering/GDCdata/TCGA-BRCA-RNASeq-SummarizedExperiment.RData"
 load(saved_file_path)
-# This saves the se_object as the variable "data"
 raw_counts_matrix <- assays(data)$unstranded
 sample_data_df <- as.data.frame(colData(data))
 
-class(data) # should be class "SummarizedExperiment"
+class(data)
 head(data)
 dim(data)
 
@@ -64,7 +63,6 @@ if ("age_at_diagnosis" %in% colnames(pcaData)) {
   print(paste("Pearson correlation (PC1 vs Age):", round(cor_pc1_age, 3)))
 }
 
-## clustering
 sampleDists <- dist(t(assay(vst_data_filtered)))
 sampleDistMatrix <- as.matrix(sampleDists)
 annotation_col <- as.data.frame(colData(vst_data_filtered)[, c("sample_type", "gender")])
