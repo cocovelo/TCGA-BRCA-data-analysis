@@ -245,10 +245,214 @@ in any ML application. To do this I used:
 
 ### K-nearest neighbours classification
 
+After scaling and handling the data into the appropriate format I was able to perform K-nearest
+neighbours classification on the dataset. For this, I split the data set into two parts: a
+training set and a test set. The training set was used to train the KNN model and the test set
+was used to test and validate the model.
+
+I used the "paper_BRCA_Subtype_PAM50" variable to classify the samples, which contained the groups
+'basal','her2', 'lumA', 'lumB', 'normal' and 'NA'. I used an if/else statement to ensure that the
+correct variable was used as the target variable i.e. the PAM50 subtype. I then assigned the
+PAM50 subtype to `y_labels` using the following:
+
+`if 'paper_BRCA_Subtype_PAM50' not in meta_df.columns:`
+`    print("Error: 'paper_BRCA_Subtype_PAM50' not found in metadata. Please choose an existing column.")`
+`    if 'vital_status' in meta_df.columns:`
+`        target_variable = 'vital_status'`
+`        print(f"Using '{target_variable}' as target variable instead.")`
+`    else:`
+`        raise ValueError("No suitable target variable found for kNN classification.")`
+`else:`
+`    target_variable = 'paper_BRCA_Subtype_PAM50'`
+
+`y_labels = meta_df[target_variable]`
+
+Next I performed one final check to ensure that the samples and the key variables were aligned
+and that the model would be trained on accurate data (the X_knn and y_knn variables below):
+
+`valid_indices = y_labels.dropna().index`
+`X_knn = X_scaled.loc[valid_indices]`
+`y_knn = y_labels.loc[valid_indices]`
+
+Since machine learning models and libraries typically require labels/variables to be numeric
+rather than strings, I transformed/encoded the variables from strings to numbers. I performed
+this step using LabelEncoder from scikit-learn:
+
+`from sklearn.preprocessing import LabelEncoder`
+`label_encoder = LabelEncoder()`
+`y_encoded = label_encoder.fit_transform(y_knn)`
+
+`print(f"\nTarget Variable Unique Values ({target_variable}): {y_knn.unique()}")`
+`print(f"Encoded Labels (First 5): {y_encoded[:5]}")`
+
+The training and test sets were assigned using:
+
+`X_train, X_test, y_train, y_test = train_test_split(`
+`    X_knn, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded`
+`)`
+
+`print(f"\nTraining set size: {X_train.shape[0]} samples")`
+`print(f"Test set size: {X_test.shape[0]} samples")`
+
+I first defined a value of k = 5 to train the knn model:
+
+`from sklearn.neighbors import KNeighborsClassifier`
+`from sklearn.metrics import accuracy_score, classification_report`
+
+`knn = KNeighborsClassifier(n_neighbors=5)`
+
+Then I trained the model using the following:
+
+`knn.fit(X_train, y_train)`
+
+`y_pred = knn.predict(X_test)`
+
+Then tested the accuracy and viewed the results of the testing with: 
+
+`accuracy = accuracy_score(y_test, y_pred)`
+`report = classification_report(y_test, y_pred, target_names=label_encoder.classes_)`
+`print(f"\nkNN Classification Accuracy: {accuracy:.4f}")`
+`print("\nkNN Classification Report:\n", report)`
+
+This model had an accuracy of 0.7566. To test whether alternative values of k would
+improve upon this score, I performed the model training again iteratively from values
+of 1-31:
+
+`from sklearn.model_selection import GridSearchCV`
+`param_grid = {'n_neighbors': range(1, 31)}`
+`grid_search = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5, scoring='accuracy')`
+`grid_search.fit(X_knn, y_encoded)`
+
+`print(f"\nBest k for kNN: {grid_search.best_params_['n_neighbors']}")`
+`print(f"Best cross-validation accuracy: {grid_search.best_score_:.4f}")`
+
+This testing revealed that the optimal value of k was two, which
+scored a slightly improved accuracy value of 0.7623. Overall, for all values of k tested, the
+models performed relatively similarly with accuracy scores between 0.71 and 0.77.
+
+I used matplotlib to plot the accuracy scores against the value of k tested, the results are
+shown in this figure:
+
 ![Comparison of values of k](figures/values-of-k-knn.png)
 
 ## Deep Learning
 
+Following the knn model testing, I wanted to develop a deep learning model to attempt to
+improve on the prediction accuracy for the PAM50 classifier. I decided to use a neural network
+(multi-layer perceptron) to do this. The model takes all 18,303 gene expression values for
+each sample as input, processes them through two layers of 256 and then 128 neurons
+(applying non-linearity and dropout at each step), and finally outputs 5 values corresponding
+to the likelihood of a sample belonging to each of the five PAM50 subtypes.
+
+I first prepared the data for use in this model with the `pytorch` library:
+
+`X_train_tensor = torch.tensor(X_train.values, dtype=torch.float32)`
+`y_train_tensor = torch.tensor(y_train, dtype=torch.long)`
+
+`X_test_tensor = torch.tensor(X_test.values, dtype=torch.float32)`
+`y_test_tensor = torch.tensor(y_test, dtype=torch.long)`
+
+`train_dataset = TensorDataset(X_train_tensor, y_train_tensor)`
+`test_dataset = TensorDataset(X_test_tensor, y_test_tensor)`
+
+`batch_size = 64`
+`train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)`
+`test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)`
+
+I defined the deep learning neural network model with the following parameters:
+
+`import torch.nn as nn`
+`import torch.optim as optim`
+
+`class GeneExpressionClassifier(nn.Module):`
+`    def __init__(self, input_size, num_classes):`
+`        super(GeneExpressionClassifier, self).__init__()`
+`        self.layer1 = nn.Linear(input_size, 256)`
+`        self.relu1 = nn.ReLU()`
+`        self.dropout1 = nn.Dropout(0.3)`
+
+`        self.layer2 = nn.Linear(256, 128)`
+`        self.relu2 = nn.ReLU()`
+`        self.dropout2 = nn.Dropout(0.3)`
+
+`        self.output_layer = nn.Linear(128, num_classes)`
+
+`    def forward(self, x):`
+`        x = self.layer1(x)`
+`        x = self.relu1(x)`
+`        x = self.dropout1(x)`
+
+`        x = self.layer2(x)`
+`        x = self.relu2(x)`
+`        x = self.dropout2(x)`
+
+`        x = self.output_layer(x)`
+`        return x`
+
+`input_size = X_train.shape[1]`
+`num_classes = len(label_encoder.classes_)`
+`model = GeneExpressionClassifier(input_size, num_classes)`
+
+`criterion = nn.CrossEntropyLoss()`
+`optimizer = optim.Adam(model.parameters(), lr=0.001)`
+
+`print("\nNeural Network Model Architecture:")`
+`print(model)`
+
+I then performed the training using 50 epochs and used GPU acceleration to enhance the
+performance/computational efficiency.
+
+`num_epochs = 50`
+
+`device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`
+`model.to(device)`
+
+`print(f"\nTraining on: {device}")`
+
+`for epoch in range(num_epochs):`
+`    model.train()`
+`    running_loss = 0.0`
+`    for inputs, labels in train_loader:`
+`        inputs, labels = inputs.to(device), labels.to(device)`
+
+`        optimizer.zero_grad()`
+`        outputs = model(inputs)`
+`        loss = criterion(outputs, labels)`
+`        loss.backward()`
+`        optimizer.step()`
+
+`        running_loss += loss.item() * inputs.size(0)`
+
+`    epoch_loss = running_loss / len(train_dataset)`
+`    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}")`
+
+The following was used to view the model accuracy and key metrics so that I could compare it with the knn
+model above:
+
+`model.eval()`
+`correct = 0`
+`total = 0`
+`all_preds = []`
+`all_labels = []`
+
+`with torch.no_grad():`
+`    for inputs, labels in test_loader:`
+`        inputs, labels = inputs.to(device), labels.to(device)`
+`        outputs = model(inputs)`
+`        _, predicted = torch.max(outputs.data, 1)`
+`        total += labels.size(0)`
+`        correct += (predicted == labels).sum().item()`
+
+`        all_preds.extend(predicted.cpu().numpy())`
+`        all_labels.extend(labels.cpu().numpy())`
+
+`accuracy_dl = correct / total`
+`report_dl = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)`
+
+`print(f"\nDeep Learning Classification Accuracy on Test Set: {accuracy_dl:.4f}")`
+`print("\nDeep Learning Classification Report:\n", report_dl)`
+
+This neural network performance was superior to the knn model with an accuracy of 0.8684.
 
 
 ## Dependencies
