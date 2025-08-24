@@ -454,14 +454,3 @@ model above:
 
 This neural network performance was superior to the knn model with an accuracy of 0.8684.
 
-
-## Dependencies
-library(tidyverse)
-library(GEOquery)
-library(TCGAbiolinks)
-library(SummarizedExperiment)
-library(PCAtools)
-library(edgeR)
-library(DESeq2)
-library(PCAtools)
-
