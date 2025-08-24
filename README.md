@@ -1,5 +1,10 @@
 # Identification, access, harvesting and analysis of a TCGA BRCA data set
 
+This readme describes the process of identifying, accessing, downloading and analysing
+a TCGA-BRCA dataset for the purposes of exploratory analysis and use in machine learning
+applications. The relevant R, py or ipynb files contain the code only, while this readme
+provides some explanation of the processes and is designed to operate as more of a walk-through.
+
 ## Identification of samples, downloading associated data and loading into R
 
 Initially, I used the GDC data portal to filter samples and identify samples for use. Since I did this manually,
@@ -154,7 +159,7 @@ I performed the same tests for the "paper_BRCA_Subtype_PAM50" variable:
 `summary(aov_result_pc1)`
 `aov_result_pc2 <- aov(PC2 ~ paper_BRCA_Subtype_PAM50, data = pcaData)`
 `summary(aov_result_pc2)`
-These tests confirmed that paper_BRCA_Subtype_PAM50  was also significantly associated with
+These tests confirmed that paper_BRCA_Subtype_PAM50 was also significantly associated with
 PC1 and PC2. Testing of race confirmed that race was significantly associated with the PCs
 which means that race should be considered in any future statistical modelling.
 
@@ -198,6 +203,45 @@ I used the following to create the heatmap plot:
 ![Sample-to-sample distance heatmap](figures/sampletosampledistanceheatmap.png)
 
 ## Machine learning applications
+
+### Data handling
+
+After exploring the data I wanted to test some machine learning models to determine their
+accuracy in predicting sample groups. To do this I initially loaded the data into python
+with:
+
+`import pandas as pd`
+`from sklearn.preprocessing import StandardScaler`
+`from sklearn.model_selection import train_test_split`
+`import torch`
+`from torch.utils.data import DataLoader, TensorDataset`
+`import numpy as np`
+
+`df = pd.read_csv("C:/Users/colin/PycharmProjects/PythonProject/tcga-brca-project/tcga-brca-vst-normalized-counts.csv", index_col=0)`
+`metadata_df = pd.read_csv("C:/Users/colin/PycharmProjects/PythonProject/tcga-brca-project/tcga_brca_sample_metadata.csv", index_col=0)`
+
+Then transposed the data rows/columns with `X = df.T`. Next I combined the metadata with the
+expression data using the sample ID and ensured the integrity of the data set using:
+
+`common_samples = list(set(X.index) & set(metadata_df.index))`
+`X = X.loc[common_samples].sort_index()`
+`meta_df = metadata_df.loc[common_samples].sort_index()`
+
+`print(f"\nExpression Data Shape (Samples x Genes): {X.shape}")`
+`print(f"Metadata Shape (Samples x Features): {meta_df.shape}")`
+`print(f"Are all sample IDs aligned? {all(X.index == meta_df.index)}")`
+`print("\nAligned Expression Data (First 5 Sample IDs):")`
+`print(X.index[:5].tolist())`
+`print("\nAligned Metadata (First 5 Sample IDs):")`
+`print(meta_df.index[:5].tolist())`
+
+After this manipulation of the data I had to Z-scale normalise it prior to using it
+in any ML application. To do this I used:
+
+`scaler = StandardScaler()`
+`X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns, index=X.index)`
+`print("\nScaled Expression Data (Head):")`
+`print(X_scaled.head())`
 
 ### K-nearest neighbours classification
 
