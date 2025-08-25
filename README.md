@@ -20,8 +20,8 @@ gdc_sample_sheet.2025-08-18(1).tsv
 clinical.cart.2025-08-18.tar
 biospecimen.cart.2025-08-18.tar
 
-I next created a `manifest` R object with:
-`manifest <- read.delim("C:/Users/colin/Downloads/gdc_manifest.2025-08-18.140242.txt")`
+I next created a `manifest` R object with: \
+`manifest <- read.delim("C:/Users/colin/Downloads/gdc_manifest.2025-08-18.140242.txt")` \
 
 The next step was to create a query variable which describes the TCGA project:
 `query <- GDCquery(
