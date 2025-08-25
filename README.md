@@ -24,13 +24,13 @@ I next created a `manifest` R object with: \
 `manifest <- read.delim("C:/Users/colin/Downloads/gdc_manifest.2025-08-18.140242.txt")`
 
 The next step was to create a query variable which describes the TCGA project: \
-`query <- GDCquery(  
-        project = "TCGA-BRCA",  
-        data.category = "Transcriptome Profiling",  
-        data.type = "Gene Expression Quantification",  
-        workflow.type = "STAR - Counts",  
-        barcode = manifest$id  
-        )`
+`query <- GDCquery(`  
+`        project = "TCGA-BRCA",`  
+`        data.category = "Transcriptome Profiling",`  
+`        data.type = "Gene Expression Quantification",`  
+`        workflow.type = "STAR - Counts",`  
+`        barcode = manifest$id`  
+`        )`  
 
 Using the query object, I then used the following in a terminal to download the files associated with gdc_manifest.txt: \
 `"C:/Users/colin/Downloads/gdc-client_2.3_Windows_x64-py3.8-windows-2019/gdc-client_2.3_Windows_x64/gdc-client.exe" download -m "C:/path/to/your/gdc_manifest.txt"`
