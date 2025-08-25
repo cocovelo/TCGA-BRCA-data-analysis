@@ -38,12 +38,12 @@ Using the query object, I then used the following in a terminal to download the 
 It was necessary to download the data in this way rather than using `GDCdownload()` as there was a mismatch between
 the files included in my manifest and those expected by `GDCdownload()`. I then prepared the data in R using
 GDCprepare, however in order to do this I had to first specify where the data were saved and what the
-output file would be named: \
+output file would be named:  
 
 `output_filename <- "TCGA-BRCA-RNASeq-SummarizedExperiment.RData"
 data_dir <- "C:/Users/colin/Documents/R projects/RNA-seq-clustering/GDCdata/"`
 
-I then created the `se_object` with: \
+I then created the `se_object` with:  
 
 `se_object <- GDCprepare(
     query = query,
