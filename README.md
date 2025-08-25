@@ -251,20 +251,10 @@ training set and a test set. The training set was used to train the KNN model an
 was used to test and validate the model.
 
 I used the "paper_BRCA_Subtype_PAM50" variable to classify the samples, which contained the groups
-'basal','her2', 'lumA', 'lumB', 'normal' and 'NA'. I used an if/else statement to ensure that the
-correct variable was used as the target variable i.e. the PAM50 subtype. I then assigned the
-PAM50 subtype to `y_labels` using the following:
+'basal','her2', 'lumA', 'lumB', 'normal' and 'NA'. I assigned the PAM50 subtype as the target variable
+using the following:
 
-`if 'paper_BRCA_Subtype_PAM50' not in meta_df.columns:`
-`    print("Error: 'paper_BRCA_Subtype_PAM50' not found in metadata. Please choose an existing column.")`
-`    if 'vital_status' in meta_df.columns:`
-`        target_variable = 'vital_status'`
-`        print(f"Using '{target_variable}' as target variable instead.")`
-`    else:`
-`        raise ValueError("No suitable target variable found for kNN classification.")`
-`else:`
-`    target_variable = 'paper_BRCA_Subtype_PAM50'`
-
+`target_variable = 'paper_BRCA_Subtype_PAM50'`
 `y_labels = meta_df[target_variable]`
 
 Next I performed one final check to ensure that the samples and the key variables were aligned
