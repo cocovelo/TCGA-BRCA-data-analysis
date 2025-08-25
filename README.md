@@ -73,8 +73,8 @@ While row names were, for example:
  [6] "ENSG00000000938.13" "ENSG00000000971.16" "ENSG00000001036.14" "ENSG00000001084.13" "ENSG00000001167.14"
 
 
-Row names and column names were saved:
-`raw_rownames <- rownames(se_object)`
+Row names and column names were saved:  \
+`raw_rownames <- rownames(se_object)`  \
 `raw_colnames <- colnames(se_object)`
 
 I then attempted to determine how many of the rows contained gene expression data by
