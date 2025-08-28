@@ -392,29 +392,34 @@ I defined the deep learning neural network model with the following parameters:
 I then performed the training using 50 epochs and used GPU acceleration to enhance the
 performance/computational efficiency.
 
-`num_epochs = 50`
+`num_epochs = 50`  
+`training_loss_history = []`  
 
-`device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`
-`model.to(device)`
+`device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`  
+`model.to(device)`  
 
-`print(f"\nTraining on: {device}")`
+`print(f"\nTraining on: {device}")`  
 
-`for epoch in range(num_epochs):`
-`    model.train()`
-`    running_loss = 0.0`
-`    for inputs, labels in train_loader:`
-`        inputs, labels = inputs.to(device), labels.to(device)`
+`for epoch in range(num_epochs):`  
+`    model.train()`  
+`    running_loss = 0.0`  
+    
+`    for inputs, labels in train_loader:`  
+`        inputs, labels = inputs.to(device), labels.to(device)`  
+`        optimizer.zero_grad()`  
+`        outputs = model(inputs)`  
+`        loss = criterion(outputs, labels)`  
+`        loss.backward()`  
+`        optimizer.step()`  
 
-`        optimizer.zero_grad()`
-`        outputs = model(inputs)`
-`        loss = criterion(outputs, labels)`
-`        loss.backward()`
-`        optimizer.step()`
+`        running_loss += loss.item() * inputs.size(0)`  
 
-`        running_loss += loss.item() * inputs.size(0)`
+`    epoch_loss = running_loss / len(train_dataset)`  
+    
+`    training_loss_history.append(epoch_loss)`  
+    
+`    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}")`  
 
-`    epoch_loss = running_loss / len(train_dataset)`
-`    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}")`
 
 The following was used to view the model accuracy and key metrics so that I could compare it with the knn
 model above:
@@ -442,5 +447,27 @@ model above:
 `print(f"\nDeep Learning Classification Accuracy on Test Set: {accuracy_dl:.4f}")`
 `print("\nDeep Learning Classification Report:\n", report_dl)`
 
-This neural network performance was superior to the knn model with an accuracy of 0.8684.
+This neural network performance was superior to the knn model with an accuracy of 0.8684. I
+plotted the loss curve:
 
+`import matplotlib.pyplot as plt`  
+
+`epochs = range(1, len(training_loss_history) + 1)`  
+`plt.plot(epochs, training_loss_history, label='Training Loss')`  
+`plt.title('Training Loss')`  
+`plt.xlabel('Epochs')`  
+`plt.ylabel('Loss')`  
+`plt.legend()`  
+`plt.grid(True)`  
+`plt.savefig('loss_curve.png')`  
+`plt.show()`  
+
+
+### Cross-validation of machine learning models
+
+In order to further test/validate the machine learning models I searched GEO and
+other data repositories to find suitable RNA-seq data sets which contained breast
+cancer tumour samples AND crucially that also had PAM50 classification data too.
+I identified GSE135298 and GSE181466 as suitable datasets. GSE135298 contained 94
+samples and GSE181466 contained 98 such samples. I downloaded the data sets
+directly from the accession pages on the GEO website. TBC...
