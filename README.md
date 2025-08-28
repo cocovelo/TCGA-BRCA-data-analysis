@@ -5,6 +5,18 @@ a TCGA-BRCA dataset for the purposes of exploratory analysis and use in machine 
 applications. The relevant R, py or ipynb files contain the code only, while this readme
 provides some explanation of the processes and is designed to operate as more of a walk-through.
 
+## Table of contents
+
+* [Identification of samples, downloading associated data and loading into R](#identification-of-samples-downloading-associated-data-loading-into-R)
+* [Exploratory data analysis](#exploratory-data-analysis)
+* [Clustering of samples](#clustering-of-samples)
+* [Machine learning applications](#machine-learning-applications)
+* [Data handling](#data-handling)
+* [K-nearest neighbours classification](#k-nearest-neighbours-classification)
+* [Deep Learning](#deep-learning)
+* [Cross-validation of machine learning models](#cross-validation-of-machine-learning-models)
+
+
 ## Identification of samples, downloading associated data and loading into R
 
 Initially, I used the GDC data portal to filter samples and identify samples for use. Since I did this manually,
